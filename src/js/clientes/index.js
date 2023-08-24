@@ -1,0 +1,137 @@
+import Swal from "sweetalert2";
+import Datatable from "datatables.net-bs5";
+import { lenguaje } from "../lenguaje";
+import { validarFormulario, Toast, confirmacion } from "../funciones";
+
+const formulario = document.getElementById('formularioClientes');
+const btnBuscar = document.getElementById('btnBuscar');
+const btnModificar = document.getElementById('btnModificar');
+const btnGuardar = document.getElementById('btnGuardar');
+const btnCancelar = document.getElementById('btnCancelar');
+const divTabla = document.getElementById('#tablaClientes');
+
+btnModificar.disabled = true;
+btnModificar.parentElement.style.display = 'none';
+btnCancelar.disabled = true;
+btnCancelar.parentElement.style.display = 'none';
+
+let contador = 1;
+const datatable = new Datatable('#tablaClientes', {
+    language: lenguaje,
+    data: null,
+    columns: [
+        {
+            title: 'NO',
+            render: () => contador++
+        },
+        {
+            title: 'NOMBRE',
+            data: 'cliente_nombre'
+        },
+        {
+            title: 'NIT',
+            data: 'cliente_nit'
+        },
+        {
+            title: 'MODIFICAR',
+            data: 'cliente_id',
+            searchable: false,
+            orderable: false,
+            render: (data, type, row, meta) => `<button class="btn btn-warning" data-id='${data}' data-nombre='${row["cliente_nombre"]}' data-nit='${row["cliente_nit"]}'>Modificar</button>`
+        },
+        {
+            title: 'ELIMINAR',
+            data: 'cliente_id',
+            searchable: false,
+            orderable: false,
+            render: (data) => `<button class="btn btn-danger" data-id='${data}'>Eliminar</button>`
+        },
+    ]
+});
+
+const buscar = async () => {
+    const cliente_nombre = formulario.cliente_nombre.value;
+    const cliente_nit = formulario.cliente_nit.value;
+    const url = `/datatable/API/clientes/buscar?cliente_nombre=${cliente_nombre}&cliente_nit=${cliente_nit}`;
+    const config = {
+        method: 'GET'
+    };
+
+    try {
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        datatable.clear().draw();
+        if (data) {
+            contador = 1;
+            datatable.rows.add(data).draw();
+        } else {
+            Toast.fire({
+                title: 'No se encontraron registros',
+                icon: 'info'
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const guardar = async (evento) => {
+    evento.preventDefault();
+    if (!validarFormulario(formulario, ['cliente_id'])) {
+        Toast.fire({
+            icon: 'info',
+            text: 'Debe llenar todos los datos'
+        });
+        return;
+    }
+
+    const body = new FormData(formulario);
+    body.delete('cliente_id');
+    const url = '/datatable/API/clientes/guardar';
+    const config = {
+        method: 'POST',
+        body
+    };
+
+    try {
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        const { codigo, mensaje, detalle } = data;
+        let icon = 'info';
+        switch (codigo) {
+            case 1:
+                formulario.reset();
+                icon = 'success';
+                buscar();
+                break;
+
+            case 0:
+                icon = 'error';
+                console.log(detalle);
+                break;
+
+            default:
+                break;
+        }
+        Toast.fire({
+            icon,
+            text: mensaje
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+
+
+buscar();
+
+formulario.addEventListener('submit', guardar);
+btnBuscar.addEventListener('click', buscar);
+datatable.on('click', '.btn-warning', traeDatos);
+datatable.on('click', '.btn-danger', eliminar);
+btnModificar.addEventListener('click', modificar)
+btnCancelar.addEventListener('click', cancelarAccion)
