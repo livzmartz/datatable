@@ -1,0 +1,76 @@
+<?php
+
+namespace Controllers;
+use Exception;
+use Model\Cliente;
+use MVC\Router;
+
+class ClienteController{
+    public static function index(Router $router) {
+        $router->render('clientes/index', []);
+        
+    }
+
+    public static function guardarApi(){
+     
+        try {
+            $cliente = new Cliente($_POST);
+            $resultado = $cliente->crear();
+
+            if ($resultado['resultado'] == 1) {
+                echo json_encode([
+                    'mensaje' => 'Registro guardado correctamente',
+                    'codigo' => 1
+                ]);
+            } else {
+                echo json_encode([
+                    'mensaje' => 'Ocurrió un error',
+                    'codigo' => 0
+                ]);
+            }
+            // echo json_encode($resultado);
+        } catch (Exception $e) {
+            echo json_encode([
+                'detalle' => $e->getMessage(),
+                'mensaje' => 'Ocurrió un error',
+                'codigo' => 0
+            ]);
+        }
+    }
+
+   
+    public static function buscarApi()
+    {
+        // $cliente = Cliente::all();
+        $cliente_nombre = $_GET['cliente_nombre'];
+        $cliente_nit = $_GET['cliente_nit'];
+       
+
+        $sql = "SELECT * FROM clientes where cliente_situacion = 1 ";
+        if ($cliente_nombre != '') {
+            $sql .= " and cliente_nombre like '%$cliente_nombre%' ";
+        }
+
+        if ($cliente_nit != '') {
+            $sql .= " and cliente_nit like '%$cliente_nit%' ";
+        }
+        
+        
+        try {
+            
+            $cliente = Cliente::fetchArray($sql);
+            header('Content-Type: application/json');
+
+            echo json_encode($cliente);
+        } catch (Exception $e) {
+            echo json_encode([
+                'detalle' => $e->getMessage(),
+                'mensaje' => 'Ocurrió un error',
+                'codigo' => 0
+            ]);
+        }
+    }
+
+    
+
+}
