@@ -5,6 +5,8 @@ require_once __DIR__ . '/../includes/app.php';
 use MVC\Router;
 use Controllers\AppController;
 use Controllers\LoginController;
+use Controllers\ClienteController;
+
 
 
 
@@ -16,7 +18,8 @@ $router->get('/menu', [LoginController::class,'menu']);
 $router->get('/logout', [LoginController::class,'logout']);
 $router->post('/API/login', [LoginController::class,'loginAPI']);
 
-
+$router->get('/clientes', [ClienteController::class,'index']);
+$router->get('/API/clientes/buscar', [ClienteController::class,'buscarApi']);
 
 
 
