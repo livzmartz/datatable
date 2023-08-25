@@ -1,7 +1,6 @@
 <nav class="navbar navbar-dark bg-dark fixed-top navbar-expand-lg">
     <a class="navbar-brand" href="/datatable/menu">Menú</a>
 
-
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
@@ -15,13 +14,11 @@
     <a href="/datatable/logout" class="btn btn-danger">Cerrar sesión</a>
 </nav>
 <br>
-<div class="row mb-3">
-    <div class="col text-center">
-        <h1>DATATABLES Y GRAFICAS</h1>
-    </div>
-</div>
-<div class="row justify-content-center">
+<h1>ESTADISTICA DE LAS COMPRAS DE LOS CLIENTES</h1>
+<button id="btnActualizar" class="btn btn-info">Actualizar</button>
+<div class="row">
     <div class="col-lg-4">
-        <img src="./images/cit.png" width="100%" alt="">
+        <canvas id="chartCompras" width="100%"></canvas>
     </div>
 </div>
+<script src="<?=asset('./build/js/clientes/estadistica.js') ?>"></script>

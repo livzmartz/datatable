@@ -11,7 +11,7 @@
                 <a class="nav-link" href="/datatable/clientes">Clientes</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Estadisticas</a>
+                <a class="nav-link" href="/datatable/clientes/estadistica">Estadisticas</a>
             </li>
         </ul>
     </div>
