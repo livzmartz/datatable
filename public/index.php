@@ -21,7 +21,9 @@ $router->post('/API/login', [LoginController::class,'loginAPI']);
 $router->get('/clientes/index', [ClienteController::class,'index']);
 $router->get('/clientes', [ClienteController::class,'index']);
 $router->get('/API/clientes/buscar', [ClienteController::class,'buscarApi']);
-
+$router->post('/API/clientes/guardar', [ClienteController::class,'guardarApi']);
+$router->post('/API/clientes/modificar', [ClienteController::class,'modificarApi']);
+$router->post('/API/clientes/eliminar', [ClienteController::class,'eliminarApi']);
 
 
 

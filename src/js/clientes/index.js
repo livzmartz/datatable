@@ -124,8 +124,159 @@ const guardar = async (evento) => {
     }
 };
 
+const eliminar = async (e) => {
+    const button = e.target;
+    const id = button.dataset.id;
+
+    if (await confirmacion('warning', '¿Desea eliminar este registro?')) {
+        const body = new FormData();
+        body.append('cliente_id', id);
+        const url = '/datatable/API/clientes/eliminar';
+        const config = {
+            method: 'POST',
+            body
+        };
+
+        try {
+            const respuesta = await fetch(url, config);
+            const data = await respuesta.json();
+
+            const { codigo, mensaje, detalle } = data;
+            let icon = 'info';
+            switch (codigo) {
+                case 1:
+                    icon = 'success';
+                    buscar();
+                    break;
+
+                case 0:
+                    icon = 'error';
+                    console.log(detalle);
+                    break;
+
+                default:
+                    break;
+            }
+            Toast.fire({
+                icon,
+                text: mensaje
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+};
+const cancelarAccion = () => {
+    btnGuardar.disabled = false
+    btnGuardar.parentElement.style.display = ''
+    btnBuscar.disabled = false
+    btnBuscar.parentElement.style.display = ''
+    btnModificar.disabled = true
+    btnModificar.parentElement.style.display = 'none'
+    btnCancelar.disabled = true
+    btnCancelar.parentElement.style.display = 'none'
+    divTabla.style.display = ''
+}
+const traeDatos = async (e) => {
+    const button = e.target;
+    const id = button.dataset.id;
+    const nombre = button.dataset.nombre;
+    const nit = button.dataset.nit;
+
+    const dataset = {
+        id,
+        nombre,
+        nit
+    };
+
+    colocarDatos(dataset);
+
+    const body = new FormData(formulario);
+    body.append('cliente_id', id);
+    body.append('cliente_nombre', nombre);
+    body.append('cliente_nit', nit);
+  
+};
+
+const colocarDatos = (dataset) => {
+    formulario.cliente_nombre.value = dataset.nombre;
+    formulario.cliente_nit.value = dataset.nit;
+    formulario.cliente_id.value = dataset.id;
+    
+    btnGuardar.disabled = true;
+    btnGuardar.parentElement.style.display = 'none';
+    btnBuscar.disabled = true;
+    btnBuscar.parentElement.style.display = 'none';
+    
+    btnModificar.disabled = false;
+    btnModificar.parentElement.style.display = '';
+    btnCancelar.disabled = false;
+    btnCancelar.parentElement.style.display = '';
+    
+    divTabla.style.display = 'none';
+};
 
 
+const modificar = async () => {
+  
+    if (!validarFormulario(formulario)) {
+        Toast.fire({
+            icon: 'info',
+            text: 'Debe llenar todos los datos'
+        })
+        return
+    }
+
+    const body = new FormData(formulario)
+    const url = '/datatable/API/clientes/modificar';
+    const headers = new Headers();
+    headers.append("X-Requested-With","fetch");
+    const config = {
+        method: 'POST',
+        body
+    }
+
+    try {
+        // fetch(url, config).then( (respuesta) => respuesta.json() ).then(d => data = d)
+        const respuesta = await fetch(url, config)
+        const data = await respuesta.json();
+        //    console.log(data);
+        //    return;
+
+        const { codigo, mensaje, detalle } = data;
+        let icon = 'info'
+        switch (codigo) {
+            case 1:
+                formulario.reset();
+                Toast.fire({
+                    icon: 'success',
+                    text: mensaje
+                })
+                buscar();
+                cancelarAccion();
+                break;
+
+            case 0:
+                Toast.fire({
+                    icon: 'error',
+                    text: mensaje
+                })
+                console.log(detalle)
+                break;
+
+            default:
+                break;
+        }
+
+        Toast.fire({
+            icon,
+            text: mensaje
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 buscar();
 
